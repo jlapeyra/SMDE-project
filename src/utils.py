@@ -1,9 +1,9 @@
 
-def join_nullables(a:str|None, b:str|None):
+def join(a:str|None, b:str|None):
     if a and b:
-        return a + ' ' + b
+        return str(a) + ' ' + str(b)
     if a:
-        return a
+        return str(a)
     if b:
-        return b
+        return str(b)
     return ''
