@@ -1,4 +1,0 @@
-UNCHECKED ASSUMPTIONS
-
-The time taken for a marathon streach (length 2..5 km) follows a normal distribution where stdev = 0.25*mean.
-The mean and stdev depends only on the runner. Different streaches are mutually independent.
