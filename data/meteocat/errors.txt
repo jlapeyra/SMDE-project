@@ -1,0 +1,15 @@
+2011-01-25;MissingData: VelocitatDireccioVent
+2011-01-26;MissingData: VelocitatDireccioVent
+2011-01-27;MissingData: VelocitatDireccioVent
+2017-07-07;MissingData: VelocitatDireccioVent
+2017-07-08;MissingData: VelocitatDireccioVent
+2017-07-09;MissingData: VelocitatDireccioVent
+2017-07-10;MissingData: VelocitatDireccioVent
+2011-01-29;MissingData: Irradiació solar global
+2011-01-30;MissingData: Irradiació solar global
+2016-09-24;MissingData: Irradiació solar global
+2016-09-25;MissingData: Irradiació solar global
+2016-09-26;MissingData: Irradiació solar global
+2016-09-27;MissingData: Irradiació solar global
+2022-08-29;MissingData: Temperatura mitjana, Humitat relativa mitjana
+2024-06-27;MissingData: TemperaturaHumitat

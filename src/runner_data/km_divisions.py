@@ -1,10 +1,18 @@
 TOTAL_LENGTH = 42.195 #km marathon
-km_points = [0, 5, 10, 15, 20, 25, 27.5, 30, 35, 37.5, 40, TOTAL_LENGTH]
+#points = [0, 5, 10, 15, 20, 25, 27.5, 30, 35, 37.5, 40, TOTAL_LENGTH]
 
-def km_col(km_point):
-    return f'{km_point}K'
+points = [0, 5, 10, 15, 20, 25, 30, 35, 40, TOTAL_LENGTH]
+stretches = list(zip(points[:-1], points[1:]))
 
-def streach_col(km_point_start, km_point_end):
-    return f'{km_point_start}K-{km_point_end}K'
+def primary_col(point):
+    if point == TOTAL_LENGTH:
+        return 'Official Time'
+    #if point == TOTAL_LENGTH/2: 
+    #   return 'Half'
+    return f'{point}K'
 
-TOTAL_LENGTH_COL = f'{TOTAL_LENGTH}K'
+def col(point):
+    return f'{point}K'
+
+def stretch_col(start, end):
+    return f'{start}-{end}K'

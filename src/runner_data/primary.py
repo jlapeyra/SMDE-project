@@ -1,6 +1,7 @@
-from km_divisions import km_points, TOTAL_LENGTH
+import km_divisions as km
 import pandas as pd
 import glob
+import utils
 
 def timeFormatToMinutes(time:str):
     'convert time in the format hh:mm:ss to minutes'
@@ -17,68 +18,64 @@ def formatTime(time:int):
     'convert time in seconds to the format hh:mm:ss'
     return f'{time//3600:02}:{time%3600//60:02}:{time%60:02}'
 
-km_point_columns = [
-    ('0K', 0),
-    ('5K', 5),
-    ('10K', 10),
-    ('15K', 15),
-    ('20K', 20),
-    ('Half', TOTAL_LENGTH/2),
-    ('25K', 25),
-    ('30K', 30),
-    ('35K', 35),
-    ('40K', 40),
-    ('Official Time', TOTAL_LENGTH)
-]
-
-km_points_idx = {}
-for km_point in km_points:
-    for i in range(len(km_point_columns)):
-        if km_point_columns[i][1] == km_point:
-            km_points_idx[km_point] = i,i
-            break
-        elif km_point_columns[i][1] > km_point:
-            km_points_idx[km_point] = i-1,i
-            break
-
-def closestNonNA(row, start, inc):
-    for col, val in km_point_columns[start::inc]:
-        if pd.notna(row[col]):
-            return col, val
-    return None, None
-
-def estimateTime(km_point, row):
-    '''
-    estimate the time taken to reach each kilometer point if the time is not recorded in the data
-    '''
-    prev, post = km_points_idx[km_point]
-    col0, val0 = closestNonNA(row, prev, -1)
-    col1, val1 = closestNonNA(row, post, +1)
-    if None in (col0, col1):
-        return pd.NA
-    elif col0 == col1: 
-        return row[col0]
-    else:
-        return row[col0] + (row[col1]-row[col0])*(km_point-val0)/(val1-val0)
-
-#estimate time taken to reach each kilometer point based on the kilometer points recorded in the data
 df_list = []
-for path in glob.glob('data/primary/marathon_results_*.csv'):
+#for path in glob.glob('data/primary/marathon_results_*.csv'):
+for year in [2015, 2016, 2017]:
+    path = f'data/primary/marathon_results_{year}.csv'
     df_in = pd.read_csv(path)
-    df_in['0K'] = 0
-    for col,_ in km_point_columns[1:]:
-        df_in[col] = df_in[col].apply(timeFormatToMinutes)
-    df_out = pd.DataFrame()
+
+    df_out = pd.DataFrame(index=df_in.index)
+    df_out['Year'] = year
     df_out['Age'] = df_in['Age']
     df_out['Gender'] = df_in['M/F']
-    for km_point in km_points:
-        df_out[f'{km_point}K'] = df_in.apply(lambda row: estimateTime(km_point, row), axis=1)
+    df_out['Time'] = df_in['Official Time'].apply(timeFormatToMinutes)
+    df_out['Ranking'] = df_in['Overall']
+    df_out['Ranking gender'] = df_in['Gender']
+    df_out['Ranking division'] = df_in['Division']
+    df_out['0K'] = 0
+    for km_point in km.points[1:]:
+        col_in = km.primary_col(km_point)
+        col_out = km.col(km_point)
+        df_out[col_out] = df_in[col_in].apply(timeFormatToMinutes)
     df_list.append(df_out)
 
 df = pd.concat(df_list).reset_index(drop=True)
-df.to_csv('data/curated/runner_data.csv', index=False, float_format='%.2f')
 
+df.map(utils.float_formatter(3)).to_csv('data/runner_data.csv', index=False)
+
+
+# km_points_idx = {}
+# for km_point in km.points:
+#     for i in range(len(km_point_columns)):
+#         if km_point_columns[i][1] == km_point:
+#             km_points_idx[km_point] = i,i
+#             break
+#         elif km_point_columns[i][1] > km_point:
+#             km_points_idx[km_point] = i-1,i
+#             break
+
+# def closestNonNA(row, start, inc):
+#     for col, val in km_point_columns[start::inc]:
+#         if pd.notna(row[col]):
+#             return col, val
+#     return None, None
+
+# def estimateTime(km_point, row):
+#     '''
+#     estimate the time taken to reach each kilometer point if the time is not recorded in the data
+#     '''
+#     prev, post = km_points_idx[km_point]
+#     col0, val0 = closestNonNA(row, prev, -1)
+#     col1, val1 = closestNonNA(row, post, +1)
+#     if None in (col0, col1):
+#         return pd.NA
+#     elif col0 == col1: 
+#         return row[col0]
+#     else:
+#         return row[col0] + (row[col1]-row[col0])*(km_point-val0)/(val1-val0)
     
+#for km_point in km_points:
+#    df_out[f'{km_point}K'] = df_in.apply(lambda row: estimateTime(km_point, row), axis=1)
 
 
 
