@@ -2,14 +2,20 @@ import random
 from dataclasses import dataclass, field
 from abc import ABC
 from scipy import stats
-from events import Queue
+import math
 
 class Aid(ABC):  #service in aid station
+    num_queues:int = math.inf
+    prob_some_use:float = 1
     period_use:float
     mean_duration:float
 
+    def __init__(self, num_queues=None):
+        if num_queues is not None:
+            self.num_queues = num_queues
+
     def prob_use(self, time_since_last_use:float):
-        return stats.expon.cdf(time_since_last_use, scale=self.period_use)
+        return stats.expon.cdf(time_since_last_use, scale=self.period_use)*self.prob_some_use
     
     def decide_use(self, time_since_last_use:float):
         return random.random() < self.prob_use(time_since_last_use)
@@ -23,8 +29,9 @@ class Aid(ABC):  #service in aid station
         return self.__class__.__name__
 
 class WC(Aid):
-    period_use=4*60
-    mean_duration=1
+    period_use=5*60
+    prob_some_use=0.25
+    mean_duration=45/60
 
 class Water(Aid):
     period_use=20
@@ -43,16 +50,16 @@ class KM: #start, aid station or finish
 
 AID_STATIONS = [
     KM(0),
-    KM(5,    [WC(), Water()]),
-    KM(10,   [WC(), Water()]),
-    KM(15,   [WC(), Water()]),
-    KM(20,   [WC(), Water(), Food()]),
-    KM(25,   [WC(), Water(), Food()]),
-    KM(27.5, [WC(), Water()]),
-    KM(30,   [WC(), Water(), Food()]),
-    KM(35,   [WC(), Water(), Food()]),
-    KM(37.5, [WC(), Water()]),
-    KM(40,   [WC(), Water(), Food()]),
+    KM(5,    [WC(20), Water(60)]),
+    KM(10,   [WC(20), Water(45)]),
+    KM(15,   [WC(20), Water(30)]),
+    KM(20,   [WC(20), Water(30), Food(20)]),
+    KM(25,   [WC(20), Water(20), Food(20)]),
+    KM(27.5, [WC(20), Water(20)]),
+    KM(30,   [WC(20), Water(20), Food(20)]),
+    KM(35,   [WC(20), Water(20), Food(20)]),
+    KM(37.5, [WC(20), Water(20)]),
+    KM(40,   [WC(20), Water(20), Food(20)]),
     KM(TOTAL_LENGTH)
 ]
 # source: https://www.zurichmaratobarcelona.es/wp-content/uploads/2024/05/Mapa-Circuit-ZMB25-1.pdf

@@ -7,9 +7,11 @@ import groups
 import km_divisions as km
 from scipy.stats import gaussian_kde
 import random
-import heapq
+from weather_effect import Weather, reverse_effect
 
 __RUNNER_DATA = pd.read_csv('data/runner_data.csv')
+
+__RUNNER_DATA = __RUNNER_DATA.apply(reverse_effect, axis=1)
 
 def notna(data):
     return list(filter(pd.notna, data))
@@ -50,12 +52,14 @@ def kde_estimate(kde:gaussian_kde):
 
 
 class Runner:
-    def __init__(self, bib, event_list:list, queues:dict):
+    def __init__(self, bib, event_list:list, queues:dict, weather:Weather=None):
         self.bib = bib
         self.gender = ['M', 'F'][random.random() > RATE_MALES]
         self.age = int(kde_estimate(KDE_AGE[self.gender]))
         self.age_group = groups.getGroup(self.age, 'Age')
         self.expected_time = float(kde_estimate(KDE_TOTAL_TIME[self.gender, self.age_group]))
+        if weather:
+            self.expected_time *= weather.effect(self.gender)
         self.expected_speed = TOTAL_LENGTH/self.expected_time
         self.time_group = groups.getGroup(self.expected_time, 'Time')
 
@@ -126,4 +130,4 @@ class Runner:
 
                 
 def format_time(x):
-    return f'{int(x//60)}:{int(x%60):02}'
+    return f'{int(x//60)}H{int(x%60):02}'

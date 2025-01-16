@@ -73,12 +73,15 @@ class Queue:
     def __init__(self, event_list:list, slots:int=math.inf):
         self.queue:list[Task] = []
         self.event_list = event_list
-        self.slots = slots
+        self.slots = max(1, slots)
         self.occupied = 0
         self.max_occupied = 0
+        self.count_queued = 0
+        self.time_waiting = 0
+        self.max_wait = 0
 
     def enqueue(self, task:Task, time:float):
-        self.queue.append(task)
+        self.queue.append((task, time))
         self.__try_dequeue(time)
 
     #def enqueue(self, duration:float, name:str=None, notify:Callable = None):
@@ -87,7 +90,10 @@ class Queue:
     
     def __try_dequeue(self, time):
         while self.queue and self.occupied < self.slots:
-            task = self.queue.pop(0)
+            task, time_queued = self.queue.pop(0)
+            self.count_queued += 1
+            self.time_waiting += time - time_queued
+            self.max_wait = max(self.max_wait, time - time_queued)
             add_task(self.event_list, task, time)
             self.occupied += 1
             self.max_occupied = max(self.max_occupied, self.occupied)
