@@ -4,7 +4,7 @@ try:
     levels = ['lo', 'me', 'hi']
     WEATHER_PARAMS = [levels[int(sys.argv[2][i])] for i in range(3)]
 except Exception as e:
-    print(f'USAGE: python {sys.argv[0]} NUM_RUNNERS WEATHER [FILE_OUT]')
+    print(f'USAGE: python {sys.argv[0]} NUM_RUNNERS WEATHER')
     print('\tWEATHER is a 3-long string with characters 0,1,2,')
     print('\trepresenting temperature, humidity, and wind, respectively,')
     print('\twhere values 0,1,2 represent low, medium, and high, repectively')
